@@ -1,0 +1,25 @@
+{
+  "name": "async-weather-new-dashboard",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "callback":"tsx src/callbackVersion.ts",
+    "promise":"tsx src/promiseVersion.ts",
+    "async":"tsx src/asyncAwaitVersion.ts",
+    "dev":"nodemon --exec tsx src/asyncAwaitVersion.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@types/node": "^26.5.1",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
