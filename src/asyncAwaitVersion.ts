@@ -63,7 +63,7 @@ async function getWeatherAndNews(city:string): Promise<void> {
         console.log("--- News Headlines ---")
         for (let i = 0; i < news.length; i++) {
             const post = news[i]
-            console.log(post?.title, post?.body)
+            console.log("\n"+post?.title)
         }
     } catch (error) {
         console.log("Error", error)

@@ -76,7 +76,7 @@ function getWeatherAndNews(city: string) {
                         console.log("---News headline---")
                         for (let i = 0; i < news.length; i++) {
                             const post = news[i]
-                            console.log(post?.title, post?.body)
+                            console.log(post?.title+"\n")
                         }
                     })
                 })

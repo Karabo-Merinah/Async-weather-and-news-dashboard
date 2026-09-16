@@ -58,7 +58,7 @@ function runPromiseDashboard(city: string) {
             console.log("\n--- News Headlines ---")
             for (let i = 0; i < newsData.posts.length; i++) {
                 const post = newsData.posts[i]
-                console.log(post?.title, post?.body)
+                console.log(post?.title+"\n")
             }
             console.log("-----------------------------")
         }).catch((error) => {
@@ -99,7 +99,7 @@ function runPromiseDashboard(city: string) {
                 console.log('--- News Headlines ----')
                 for (let i = 0; i < firstResults.posts.length; i++) {
                     const post = firstResults.posts[i]
-                    console.log(post?.title, post?.body)
+                    console.log(post?.title+"\n")
                 }
             }
 
