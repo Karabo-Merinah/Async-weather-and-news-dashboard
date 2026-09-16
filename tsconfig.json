@@ -11,7 +11,7 @@
     "target": "esnext",
     // "types": [],
     // For nodejs:
-    "lib": ["esnext","DOM"],
+    "lib": ["esnext"],
     "types": ["node"],
     "esModuleInterop": true,
     
