@@ -1,6 +1,7 @@
 import https from "https"
 import type { Weather, News } from "./types.js"
 import { cityNameQuestion } from "./cityQuestion.js"
+import { error } from "console"
 
 const NEWS_DUMMY_URL = "https://dummyjson.com/posts?limit=5"
 
@@ -19,6 +20,8 @@ function fetchData(url: string): Promise<any> {
                     reject(error)
                 }
             })
+        }).on("error",(error)=>{
+            reject(error)
         })
     })
 }
@@ -46,7 +49,7 @@ function runPromiseDashboard(city: string) {
     getCityCoordinates(city).then(({ latitude, longitude }) => {
         const WEATHER_URL = getWeatherUrl(latitude, longitude)
 
-        // Sequential: Weather → News
+        // Sequential Weather to  News
         fetchData(WEATHER_URL).then((weatherData: Weather) => {
             const weather = weatherData.current
             console.log("--- PROMISE DASHBOARD ---")
@@ -106,6 +109,8 @@ function runPromiseDashboard(city: string) {
         }).catch((error) => {
             console.log("Error:", error.message)
         })
+    }).catch((error)=>{
+        console.log("Error:",error.message)
     })
 }
 cityNameQuestion().then((city) => {

@@ -19,6 +19,8 @@ function fetchData(url: string): Promise<any> {
                     reject(error)
                 }
             })
+    }).on("error",(error)=>{
+        reject(error)
     })
 })
 }
@@ -105,6 +107,6 @@ async function getFastestResponse(city:string): Promise<void> {
 //calling functions to run 
 cityNameQuestion().then((city) => {
   getWeatherAndNews(city)
-// getWeatherAndNewsTogether(city)
-// getFastestResponse(city)
+getWeatherAndNewsTogether(city)
+getFastestResponse(city)
 })
