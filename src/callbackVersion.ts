@@ -5,43 +5,42 @@ import { cityNameQuestion } from "./cityQuestion.js"
 const NEWS_DUMMY_URL = "https://dummyjson.com/posts?limit=5"
 
 
-function fetchData(url: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-        https.get(url, (response) => {
-            let body = ""
-            response.on("data", (chunk) => {
-                body += chunk
-            })
-            response.on("end", () => {
-                try {
-                    resolve(JSON.parse(body))
-                } catch (error) {
-                    reject(error)
+//Converts city name into coordinates using separate success/error callbacks
+function getCityCoordinates(city:string,onSuccess:(latitude:number,lomgitude:number)=>void,onError:(error:Error)=>void){
+    const GEOCODE_URL=`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}`
+    
+    https.get(GEOCODE_URL,(response)=>{
+        let body=""
+        response.on("data",(chunk)=>{
+            body+=chunk
+        })
+        response.on("end",()=>{
+            try{
+                const data=JSON.parse(body)
+                if(data.results && data.results.length >0){
+                    const latitude=data.results[0].latitude
+                    const longitude=data.results[0].longitude
+                    onSuccess(latitude,longitude)
                 }
-            })
-    })
-})
-}
-//Converts city name into coordinates 
-function getCityCoordinates(city: string): Promise<{ latitude: number, longitude: number }> {
-        //validate the url by removing things like empty spaces 
-    const WEATHER_URL = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}`
-    return fetchData(WEATHER_URL).then((data) => {
-        if (data.results && data.results.length > 0) {
-            const { latitude, longitude } = data.results[0]
-            return { latitude, longitude }
-        }
-        else {
-            throw new Error(`${city} is not found`)
-        }
+                else{
+                    onError(new Error (`${city }is not found`))
+                }
+            }catch(error){
+                onError(error as Error)
+            }
+        })
+    }).on("error",(error)=>{
+        onError(error)
     })
 }
 
 function getWeatherUrl(latitude: number, longitude: number): string {
     return `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m`
 }
+
+//Demonstrates the callback hell with nested functions
 function getWeatherAndNews(city: string) {
-    getCityCoordinates(city).then(({ latitude, longitude }) => {
+    getCityCoordinates(city,(latitude,longitude) => {
         const  WEATHER_URL = getWeatherUrl(latitude, longitude)
         //Fetching the weather 
         // starts the request
@@ -53,8 +52,17 @@ function getWeatherAndNews(city: string) {
             })
             response.on("end", () => {
                 //body holds the full string and parse it then grab current  from weather structure
-                const weather_data: Weather = JSON.parse(body)
-                const weather = weather_data.current
+                let weather_data: Weather
+                try{
+                    weather_data=JSON.parse(body)
+                }
+                catch(error){
+                    console.log("Error parsing weather data ")
+                    return
+                }
+
+                const weather=weather_data.current
+
                 //fetching the news using the url 
                 https.get(NEWS_DUMMY_URL, (response2) => {
                     let desc = ""
@@ -63,8 +71,16 @@ function getWeatherAndNews(city: string) {
                     })
                     //desc is converted to string as it is chunks and parse it to json to retrieve only posts structure 
                     response2.on("end", () => {
-                        const news_data: News = JSON.parse(desc)
+                        let news_data: News
+                        try{
+                            news_data=JSON.parse(desc)
+                        }
+                        catch(error){
+                            console.log("Error parsing weather data ")
+                            return
+                        }
                         const news = news_data.posts
+                        //display the data in dashboard 
                         console.log("----News and Weather Dashboard ----")
                         console.log("\n")
                         console.log("--- Weather Data ---")
@@ -79,13 +95,18 @@ function getWeatherAndNews(city: string) {
                             console.log(post?.title+"\n")
                         }
                     })
-                })
+                }).on("error",(error)=>{
+                console.log("News request failed:",error.message)
             })
         })
-    }).catch((error) => {
-        console.log("Error:", error.message )
+    }).on("error",(error) => {
+        console.log("Weather request failed ", error.message )
     })
+},(error)=>{
+    console.log("Error",error.message)
 }
+)}
+
 cityNameQuestion().then((city) => {
     getWeatherAndNews(city)
 })
